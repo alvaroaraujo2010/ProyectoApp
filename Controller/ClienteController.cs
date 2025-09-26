@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 using ProyectoApp.Model;
 using ProyectoApp.Service;
@@ -26,9 +25,34 @@ namespace ProyectoApp.Controller
         public async Task<IActionResult> Obtener(long id)
         {
             var items = await _service.ListarAsync();
-            var item = items.FirstOrDefault(x=>x.Id==id);
-            if (item==null) return NotFound();
+            var item = items.FirstOrDefault(x => x.Id == id);
+            if (item == null) return NotFound();
             return Ok(item);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Actualizar(long id, [FromBody] Cliente cliente)
+        {
+            var items = await _service.ListarAsync();
+            var existente = items.FirstOrDefault(x => x.Id == id);
+            if (existente == null) return NotFound();
+
+            // actualizar propiedades
+            existente.Nombre = cliente.Nombre;
+            existente.Email = cliente.Email;
+            existente.Telefono = cliente.Telefono;
+            existente.Identificacion = cliente.Identificacion;
+
+            var actualizado = await _service.ActualizarAsync(existente);
+            return Ok(actualizado);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Eliminar(long id)
+        {
+            var eliminado = await _service.EliminarAsync(id);
+            if (!eliminado) return NotFound();
+            return NoContent();
         }
     }
 }
